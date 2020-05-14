@@ -1,6 +1,6 @@
 ## RoboNmap
 
-Robot Framework Library for the Nmap Port and Vulnerability Scanner. 
+Robot Framework Library for the Nmap Port and Vulnerability Scanner. Forked and modified for Python 3.
 
 ### Keywords Implemented
 
