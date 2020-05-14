@@ -17,7 +17,7 @@ setup(
     name='RoboNmap-python3',
     version='1.1',
     packages=[''],
-    package_dir={'': 'robonmap-python3'},
+    package_dir={'': 'robonmap'},
     url='',
     license='MIT License',
     author='Abhay Bhargav',
