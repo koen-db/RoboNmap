@@ -33,10 +33,10 @@ class RoboNmap(object):
             raise Exception('EXCEPTION: nmap scan failed: {0}'.format(nmproc.stderr))
         try:
             parsed = NmapParser.parse(nmproc.stdout)
-            print parsed
+            print(parsed)
             self.results = parsed
         except NmapParserException as ne:
-            print 'EXCEPTION: Exception in Parsing results: {0}'.format(ne.msg)
+            print('EXCEPTION: Exception in Parsing results: {0}'.format(ne.msg))
 
 
     def nmap_all_tcp_scan(self, target, file_export = None):
@@ -58,10 +58,10 @@ class RoboNmap(object):
             raise Exception('EXCEPTION: nmap scan failed: {0}'.format(nmproc.stderr))
         try:
             parsed = NmapParser.parse(nmproc.stdout)
-            print parsed
+            print(parsed)
             self.results = parsed
         except NmapParserException as ne:
-            print 'EXCEPTION: Exception in Parsing results: {0}'.format(ne.msg)
+            print('EXCEPTION: Exception in Parsing results: {0}'.format(ne.msg))
 
     def nmap_specific_udp_scan(self, target, portlist, file_export = None):
         '''
@@ -85,10 +85,10 @@ class RoboNmap(object):
             raise Exception('EXCEPTION: nmap scan failed: {0}'.format(nmproc.stderr))
         try:
             parsed = NmapParser.parse(nmproc.stdout)
-            print parsed
+            print(parsed)
             self.results = parsed
         except NmapParserException as ne:
-            print 'EXCEPTION: Exception in parsing results: {0}'.format(ne.msg)
+            print('EXCEPTION: Exception in parsing results: {0}'.format(ne.msg))
 
 
     def nmap_os_services_scan(self, target, portlist=None, version_intense = 0, file_export = None):
@@ -105,9 +105,9 @@ class RoboNmap(object):
         '''
         target = str(target)
         if portlist:
-            nmap_proc_cmd = "-Pn -sV --version-intensity {0} -p {1}".format(version_intense, portlist)
+            nmap_proc_cmd = "-Pn -sV --version-intensity {0} -p {1}".format(portlist, version_intense)
         else:
-            nmap_proc_cmd = "-Pn -sV --version-intensity {0}".format(version_intense)
+            nmap_proc_cmd = "-Pn -sV --version-intensity {0}".format(portlist)
 
         if file_export:
             nmap_proc_cmd += " -oN {0}".format(file_export)
@@ -118,10 +118,10 @@ class RoboNmap(object):
             raise Exception('EXCEPTION: nmap scan failed: {0}'.format(nmproc.stderr))
         try:
             parsed = NmapParser.parse(nmproc.stdout)
-            print parsed
+            print(parsed)
             self.results = parsed
         except NmapParserException as ne:
-            print 'EXCEPTION: Exception in parsing results: {0}'.format(ne.msg)
+            print('EXCEPTION: Exception in parsing results: {0}'.format(ne.msg))
 
 
     def nmap_script_scan(self, target, portlist=None, version_intense="0", script_name=None, file_export = None):
@@ -156,10 +156,10 @@ class RoboNmap(object):
             raise Exception('EXCEPTION: nmap scan failed: {0}'.format(nmproc.stderr))
         try:
             parsed = NmapParser.parse(nmproc.stdout)
-            print parsed
+            print(parsed)
             self.results = parsed
         except NmapParserException as ne:
-            print 'EXCEPTION: Exception in parsing results: {0}'.format(ne.msg)
+            print('EXCEPTION: Exception in parsing results: {0}'.format(ne.msg))
 
 
 
@@ -185,5 +185,12 @@ class RoboNmap(object):
                     for output in serv.scripts_results:
                         logger.info("\t Output: {0}, Elements: {1}, ID: {2}".format(output['output'], output['elements'], output['id']))
 
-
-
+    def get_TLS_ciphers(self):
+        for scanned_hosts in self.results.hosts:
+            for serv in scanned_hosts.services:
+                if serv.scripts_results:
+                    for x in serv.scripts_results:
+                        if x['id'] == "ssl-enum-ciphers":
+                            # print(x['output'])
+                            return x['output']
+        return None
