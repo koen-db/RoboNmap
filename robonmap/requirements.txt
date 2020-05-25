@@ -1,2 +1,2 @@
-python-libnmap==0.7.0
+python-libnmap
 robotframework
