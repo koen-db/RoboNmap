@@ -13,6 +13,17 @@ class RoboNmap(object):
         '''
         self.results = None
 
+    def _parseresults(self, nmproc):
+        '''
+        Parse the results of the nmap scan
+        '''
+        try:
+            parsed = NmapParser.parse(nmproc.stdout)
+            print(parsed)
+            self.results = parsed
+        except NmapParserException as ne:
+            print('EXCEPTION: Exception in Parsing results: {0}'.format(ne.msg))
+
     @keyword
     def nmap_default_scan(self, target, file_export = None):
         '''
@@ -32,12 +43,7 @@ class RoboNmap(object):
         rc = nmproc.run()
         if rc != 0:
             raise Exception('EXCEPTION: nmap scan failed: {0}'.format(nmproc.stderr))
-        try:
-            parsed = NmapParser.parse(nmproc.stdout)
-            print(parsed)
-            self.results = parsed
-        except NmapParserException as ne:
-            print('EXCEPTION: Exception in Parsing results: {0}'.format(ne.msg))
+        self._parseresults(nmproc)
 
     @keyword
     def nmap_all_tcp_scan(self, target, file_export = None):
@@ -57,12 +63,7 @@ class RoboNmap(object):
         rc = nmproc.run()
         if rc != 0:
             raise Exception('EXCEPTION: nmap scan failed: {0}'.format(nmproc.stderr))
-        try:
-            parsed = NmapParser.parse(nmproc.stdout)
-            print(parsed)
-            self.results = parsed
-        except NmapParserException as ne:
-            print('EXCEPTION: Exception in Parsing results: {0}'.format(ne.msg))
+        self._parseresults(nmproc)
 
     @keyword
     def nmap_specific_udp_scan(self, target, portlist, file_export = None):
@@ -85,12 +86,7 @@ class RoboNmap(object):
         rc = nmproc.run()
         if rc != 0:
             raise Exception('EXCEPTION: nmap scan failed: {0}'.format(nmproc.stderr))
-        try:
-            parsed = NmapParser.parse(nmproc.stdout)
-            print(parsed)
-            self.results = parsed
-        except NmapParserException as ne:
-            print('EXCEPTION: Exception in parsing results: {0}'.format(ne.msg))
+        self._parseresults(nmproc)
 
     @keyword
     def nmap_os_services_scan(self, target, portlist=None, version_intense = 0, file_export = None):
@@ -118,12 +114,7 @@ class RoboNmap(object):
         rc = nmproc.run()
         if rc != 0:
             raise Exception('EXCEPTION: nmap scan failed: {0}'.format(nmproc.stderr))
-        try:
-            parsed = NmapParser.parse(nmproc.stdout)
-            print(parsed)
-            self.results = parsed
-        except NmapParserException as ne:
-            print('EXCEPTION: Exception in parsing results: {0}'.format(ne.msg))
+        self._parseresults(nmproc)
 
     @keyword
     def nmap_script_scan(self, target, portlist=None, version_intense="0", script_name=None, file_export = None):
@@ -156,12 +147,7 @@ class RoboNmap(object):
         rc = nmproc.run()
         if rc != 0:
             raise Exception('EXCEPTION: nmap scan failed: {0}'.format(nmproc.stderr))
-        try:
-            parsed = NmapParser.parse(nmproc.stdout)
-            print(parsed)
-            self.results = parsed
-        except NmapParserException as ne:
-            print('EXCEPTION: Exception in parsing results: {0}'.format(ne.msg))
+        self._parseresults(nmproc)
 
     @keyword
     def nmap_print_results(self):
