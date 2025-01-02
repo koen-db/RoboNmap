@@ -9,8 +9,8 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 
 install_dependencies = (
-    'python-libnmap==0.7.0',
-    'robotframework==3.0.4'
+    'python-libnmap>=0.7.3',
+    'robotframework>=3.0.4'
 )
 
 setup(
@@ -22,8 +22,8 @@ setup(
     license='MIT License',
     author='Abhay Bhargav',
     install_requires = [
-    'python-libnmap==0.7.0',
-    'robotframework==3.0.4'
+    'python-libnmap>=0.7.3',
+    'robotframework>=3.0.4'
     ],
     description='RoboNmap - Robot Framework Library for the Nmap Port and Vulnerability Scanner',
     long_description = long_description,

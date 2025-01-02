@@ -1,9 +1,15 @@
+# Some standard files to ignore
+.venv/
+__pycache__/
 
+dist/
+.pypirc
+robonmap/RoboNmap.egg-info/
+
+# Ignore test results and created files
 robonmap/*.html
 robonmap/{}
 robonmap/*.xml
 robonmap/*.txt
-dist/
-.pypirc
-robonmap/README.md
-robonmap/RoboNmap.egg-info/
+nmap.txt
+results/

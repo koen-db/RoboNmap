@@ -1,6 +1,7 @@
 from libnmap.process import NmapProcess
 from libnmap.parser import NmapParser, NmapParserException
 from robot.api import logger
+from robot.api.deco import keyword
 
 
 class RoboNmap(object):
@@ -12,6 +13,7 @@ class RoboNmap(object):
         '''
         self.results = None
 
+    @keyword
     def nmap_default_scan(self, target, file_export = None):
         '''
         Runs a basic nmap scan on nmap's default 1024 ports. Performs the default scan
@@ -37,7 +39,7 @@ class RoboNmap(object):
         except NmapParserException as ne:
             print('EXCEPTION: Exception in Parsing results: {0}'.format(ne.msg))
 
-
+    @keyword
     def nmap_all_tcp_scan(self, target, file_export = None):
         '''
         Runs nmap scan against all TCP Ports with version scanning. Options used -Pn -sV -p1-65535
@@ -62,6 +64,7 @@ class RoboNmap(object):
         except NmapParserException as ne:
             print('EXCEPTION: Exception in Parsing results: {0}'.format(ne.msg))
 
+    @keyword
     def nmap_specific_udp_scan(self, target, portlist, file_export = None):
         '''
         Runs nmap against specified UDP ports given in the portlist argument.
@@ -89,7 +92,7 @@ class RoboNmap(object):
         except NmapParserException as ne:
             print('EXCEPTION: Exception in parsing results: {0}'.format(ne.msg))
 
-
+    @keyword
     def nmap_os_services_scan(self, target, portlist=None, version_intense = 0, file_export = None):
         '''
         Runs
@@ -122,7 +125,7 @@ class RoboNmap(object):
         except NmapParserException as ne:
             print('EXCEPTION: Exception in parsing results: {0}'.format(ne.msg))
 
-
+    @keyword
     def nmap_script_scan(self, target, portlist=None, version_intense="0", script_name=None, file_export = None):
         '''
         Runs nmap with the -sC arg or the --script arg if script_name is provided. Options used are: -sV --version-intensity <default:0> -sC|--script=<script_name>
@@ -160,8 +163,7 @@ class RoboNmap(object):
         except NmapParserException as ne:
             print('EXCEPTION: Exception in parsing results: {0}'.format(ne.msg))
 
-
-
+    @keyword
     def nmap_print_results(self):
         '''
         Retrieves the results of the most recent results
@@ -183,6 +185,3 @@ class RoboNmap(object):
                 if serv.scripts_results:
                     for output in serv.scripts_results:
                         logger.info("\t Output: {0}, Elements: {1}, ID: {2}".format(output['output'], output['elements'], output['id']))
-
-
-
