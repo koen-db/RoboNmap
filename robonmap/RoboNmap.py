@@ -4,6 +4,9 @@ from robot.api import logger
 from robot.api.deco import keyword
 
 
+from time import sleep
+import datetime
+
 class RoboNmap(object):
     ROBOT_LIBRARY_SCOPE = 'GLOBAL'
 
@@ -13,16 +16,40 @@ class RoboNmap(object):
         '''
         self.results = None
 
-    def _parseresults(self, nmproc):
+
+    def _call_nmap(self, target, options='', file_export=None):
         '''
-        Parse the results of the nmap scan
+        Calls the nmap process with the given options
         '''
+        target = str(target)
+        # IPv6 support
+        if ':' in target:
+            options += ' -6'
+        if file_export:
+            options += f' -oN {file_export}'
+        # Run the nmap process with the given options
+        nmproc = NmapProcess(target, options, safe_mode=not file_export)
+        rc = nmproc.run()
+        logger.debug(f'Nmap command: {nmproc.command}')
+        while nmproc.is_running():
+            task = nmproc.current_task
+            if task:
+                #convert unix timestamp to human readable time
+                time = int(task.etc)
+                eta = datetime.datetime.fromtimestamp(time).strftime('%H:%M:%S')
+                logger.debug(f"Task: {task.name} - Remaining: {task.remaining} - ETA: {eta}")
+            sleep(2)
+        # Check for errors
+        if rc != 0:
+            raise Exception(f'EXCEPTION: nmap scan failed: {nmproc.stderr}')
+        # Parse the results
         try:
             parsed = NmapParser.parse(nmproc.stdout)
             print(parsed)
             self.results = parsed
         except NmapParserException as ne:
             print('EXCEPTION: Exception in Parsing results: {0}'.format(ne.msg))
+
 
     @keyword
     def nmap_default_scan(self, target, file_export = None):
@@ -33,91 +60,79 @@ class RoboNmap(object):
         Examples:
         | nmap default scan  | target | file_export |
 
-
         '''
-        target = str(target)
-        if file_export == None:
-            nmproc = NmapProcess(target)
+        self._call_nmap(target, '', file_export)
+
+
+    @keyword
+    def nmap_specific_tcp_scan(self, target, portlist, file_export = None):
+        '''
+        Runs nmap scan against all TCP Ports without version scanning. Options used -Pn -p <portlist>
+        - file_export is an optional param that exports the file to a txt file with the -oN flag
+
+        Examples:
+        | nmap tcp scan | target | portlist <default: 1-65535>  |  [file_export] |
+        '''
+        if portlist:
+            options = f'-p {portlist}'
         else:
-            nmproc = NmapProcess(target, '-oN {0}'.format(file_export), safe_mode=False)
-        rc = nmproc.run()
-        if rc != 0:
-            raise Exception('EXCEPTION: nmap scan failed: {0}'.format(nmproc.stderr))
-        self._parseresults(nmproc)
+            options = '-p1-65535 '
+        self._call_nmap(target, options, file_export)
+
 
     @keyword
     def nmap_all_tcp_scan(self, target, file_export = None):
         '''
-        Runs nmap scan against all TCP Ports with version scanning. Options used -Pn -sV -p1-65535
-        Examples:
-        | nmap default scan  | target | file_export |
+        Runs nmap scan against all TCP Ports without version scanning. Options used -Pn -p1-65535
+        - file_export is an optional param that exports the file to a txt file with the -oN flag
 
-        file_export is an optional param that exports the file to a txt file with the -oN flag
+        Examples:
+        | nmap all tcp scan | target | [file_export] |
         '''
-        target = str(target)
-        if file_export == None:
-            nmproc = NmapProcess(target, '-p1-65535 -sV')
-        else:
-            cmd = '-p1-65535 -sV -oN {0}'.format(file_export)
-            nmproc = NmapProcess(target, cmd, safe_mode=False)
-        rc = nmproc.run()
-        if rc != 0:
-            raise Exception('EXCEPTION: nmap scan failed: {0}'.format(nmproc.stderr))
-        self._parseresults(nmproc)
+        self._call_nmap(target, '-p1-65535', file_export)
+
 
     @keyword
     def nmap_specific_udp_scan(self, target, portlist, file_export = None):
         '''
-        Runs nmap against specified UDP ports given in the portlist argument.
+        Runs nmap against specified UDP ports given in the portlist argument. Options used -sU -p <portlist>
+        ! REQUIRES ROOT PRIVILEGES !
         Arguments:
             - ``target``: IP or the range of IPs that need to be tested
             - ``portlist``: list of ports, range of ports that need to be tested. They can either be comma separated or separated by hyphen
-            example: 121,161,240 or 1-100
+            example: 121,161,240 or 1-100. Default: 1-1024
             - ``file_export``: is an optional param that exports the file to a txt file with the -oN flag
         Examples:
         | nmap specific udp scan  | target | portlist | file_export |
         '''
-        target = str(target)
-        if file_export == None:
-            nmproc = NmapProcess(target, '-p1-65535 -sV')
-        else:
-            cmd = '-sU -sV -p {0} -oN {1}'.format(portlist, file_export)
-            nmproc = NmapProcess(target, cmd, safe_mode=False)
-        rc = nmproc.run()
-        if rc != 0:
-            raise Exception('EXCEPTION: nmap scan failed: {0}'.format(nmproc.stderr))
-        self._parseresults(nmproc)
+        options = f'-sU'
+        if portlist:
+            options += f' -p {portlist}'
+        self._call_nmap(target, options, file_export)
+
 
     @keyword
-    def nmap_os_services_scan(self, target, portlist=None, version_intense = 0, file_export = None):
+    def nmap_os_services_scan(self, target, portlist=None, version_intense = 7, file_export = None):
         '''
-        Runs
+        Runs an nmap scan with OS detection and service detection. Options used are: -sV --version-intensity <default:7> -p <portlist>
         Arguments:
             - ``target``: IP or the range of IPs that need to be tested
             - ``portlist``: list of ports, range of ports that need to be tested. They can either be comma separated or separated by hyphen
             example: 121,161,240 or 1-100
-            - ``version_intense``: Version intensity of OS detection
+            - ``version_intense``: Version intensity of OS detection, `nmap` default is 7
             - ``file_export``: is an optional param that exports the file to a txt file with the -oN flag
         Examples:
         | nmap os services scan  | target | portlist | version_intense | file_export |
         '''
-        target = str(target)
+        options = f'-sV'
+        if version_intense:
+            options += f' --version-intensity {version_intense}'
         if portlist:
-            nmap_proc_cmd = "-Pn -sV --version-intensity {0} -p {1}".format(version_intense, portlist)
-        else:
-            nmap_proc_cmd = "-Pn -sV --version-intensity {0}".format(version_intense)
-
-        if file_export:
-            nmap_proc_cmd += " -oN {0}".format(file_export)
-
-        nmproc = NmapProcess(target, nmap_proc_cmd, safe_mode=False)
-        rc = nmproc.run()
-        if rc != 0:
-            raise Exception('EXCEPTION: nmap scan failed: {0}'.format(nmproc.stderr))
-        self._parseresults(nmproc)
+            options += f' -p {portlist}'
+        self._call_nmap(target, options, file_export)
 
     @keyword
-    def nmap_script_scan(self, target, portlist=None, version_intense="0", script_name=None, file_export = None):
+    def nmap_script_scan(self, target, portlist=None, version_intense=7, script_name=None, file_export = None):
         '''
         Runs nmap with the -sC arg or the --script arg if script_name is provided. Options used are: -sV --version-intensity <default:0> -sC|--script=<script_name>
         Arguments:
@@ -130,24 +145,21 @@ class RoboNmap(object):
         Examples:
         | nmap script scan  | target | portlist | version_intense | script_name |
         '''
-        target = str(target)
+        options = f'-Pn -sV '
+        if version_intense:
+            options += f' --version-intensity {version_intense}'
+
+        # TODO: further rework
         if portlist and script_name:
-            nmap_proc_cmd = "-Pn -sV --version-intensity {0} --script={1} -p {2}".format(version_intense, script_name, portlist)
+            options += f' --script={script_name} -p {portlist}'
         elif portlist and not script_name:
-            nmap_proc_cmd = "-Pn -sV --version-intensity {0} -sC -p {1}".format(version_intense, portlist)
+            options += f' -sC -p {portlist}'
         elif script_name and not portlist:
             raise Exception('EXCEPTION: If you use specific script, you have to specify a port')
         else:
-            nmap_proc_cmd = "-Pn -sV --version-intensity {0} -sC".format(version_intense)
+            options += f' -sC'
+        self._call_nmap(target, options, file_export)
 
-        if file_export:
-            nmap_proc_cmd += " -oN {0}".format(file_export)
-
-        nmproc = NmapProcess(target, nmap_proc_cmd, safe_mode=False)
-        rc = nmproc.run()
-        if rc != 0:
-            raise Exception('EXCEPTION: nmap scan failed: {0}'.format(nmproc.stderr))
-        self._parseresults(nmproc)
 
     @keyword
     def nmap_print_results(self):
