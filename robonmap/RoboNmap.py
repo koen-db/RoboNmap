@@ -56,6 +56,7 @@ class RoboNmap(object):
         '''
         Runs a basic nmap scan on nmap's default 1024 ports. Performs the default scan
         - file_export is an optional param that exports the file to a txt file with the -oN flag
+        Only stores the results, use `nmap print results` to print the results
 
         Examples:
         | nmap default scan  | target | file_export |
@@ -69,6 +70,7 @@ class RoboNmap(object):
         '''
         Runs nmap scan against all TCP Ports without version scanning. Options used -Pn -p <portlist>
         - file_export is an optional param that exports the file to a txt file with the -oN flag
+        Only stores the results, use `nmap print results` to print the results
 
         Examples:
         | nmap tcp scan | target | portlist <default: 1-65535>  |  [file_export] |
@@ -85,6 +87,7 @@ class RoboNmap(object):
         '''
         Runs nmap scan against all TCP Ports without version scanning. Options used -Pn -p1-65535
         - file_export is an optional param that exports the file to a txt file with the -oN flag
+        Only stores the results, use `nmap print results` to print the results
 
         Examples:
         | nmap all tcp scan | target | [file_export] |
@@ -102,6 +105,8 @@ class RoboNmap(object):
             - ``portlist``: list of ports, range of ports that need to be tested. They can either be comma separated or separated by hyphen
             example: 121,161,240 or 1-100. Default: 1-1024
             - ``file_export``: is an optional param that exports the file to a txt file with the -oN flag
+        Only stores the results, use `nmap print results` to print the results
+
         Examples:
         | nmap specific udp scan  | target | portlist | file_export |
         '''
@@ -121,6 +126,7 @@ class RoboNmap(object):
             example: 121,161,240 or 1-100
             - ``version_intense``: Version intensity of OS detection, `nmap` default is 7
             - ``file_export``: is an optional param that exports the file to a txt file with the -oN flag
+        Only stores the results, use `nmap print results` to print the results
         Examples:
         | nmap os services scan  | target | portlist | version_intense | file_export |
         '''
@@ -142,6 +148,7 @@ class RoboNmap(object):
             - ``version_intense``: Version intensity of OS detection
             - ``script_name``: Script Name that needs to be referenced
             - ``file_export``: is an optional param that exports the file to a txt file with the -oN flag
+        Only stores the results, use `nmap print results` to print the results
         Examples:
         | nmap script scan  | target | portlist | version_intense | script_name |
         '''
@@ -164,7 +171,7 @@ class RoboNmap(object):
     @keyword
     def nmap_print_results(self):
         '''
-        Retrieves the results of the most recent results
+        Retrieves the results of the most recent results and prints them to the log
         Examples:
         | nmap print results |
         '''
@@ -191,6 +198,8 @@ class RoboNmap(object):
         Searches for a service in the results
         Arguments:
             - ``service_name``: Name of the service that needs to be searched
+        Returns:
+            - List of tuples containing the IP and the port where the service is
         Examples:
         | nmap search for service | service_name |
         '''
