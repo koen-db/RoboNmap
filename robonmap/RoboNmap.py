@@ -183,3 +183,23 @@ class RoboNmap(object):
                 if serv.scripts_results:
                     for output in serv.scripts_results:
                         logger.info("\t Output: {0}, Elements: {1}, ID: {2}".format(output['output'], output['elements'], output['id']))
+
+
+    @keyword
+    def nmap_search_for_service(self, service_name):
+        '''
+        Searches for a service in the results
+        Arguments:
+            - ``service_name``: Name of the service that needs to be searched
+        Examples:
+        | nmap search for service | service_name |
+        '''
+        service_name = str(service_name).lower().strip()
+        services = []
+        for scanned_host in self.results.hosts:
+            logger.info(scanned_host)
+            for serv in scanned_host.services:
+                if serv.open() and serv.service == service_name:
+                    logger.info(f"Service {service_name} found on {scanned_host.address}, port {serv.port}")
+                    services.append((scanned_host.address,serv.port))
+        return services

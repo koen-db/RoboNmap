@@ -25,3 +25,9 @@ Run Specific TCP Scan on port 80
 Run Service Discovery Scan
     Nmap Os Services Scan  ${TARGET}
     nmap print results
+
+Run SSH detection Scan
+    Nmap Specific Tcp Scan  ${TARGET}  22
+    Nmap Print Results
+    ${SSH}=    Nmap Search For Service  SSH
+    Log    ${SSH}
