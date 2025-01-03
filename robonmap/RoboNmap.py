@@ -199,7 +199,7 @@ class RoboNmap(object):
         Arguments:
             - ``service_name``: Name of the service that needs to be searched
         Returns:
-            - List of tuples containing the IP and the port where the service is
+            - List of tuples containing the IP and the port where the service is, or None if not found
         Examples:
         | nmap search for service | service_name |
         '''
@@ -211,4 +211,4 @@ class RoboNmap(object):
                 if serv.open() and serv.service == service_name:
                     logger.info(f"Service {service_name} found on {scanned_host.address}, port {serv.port}")
                     services.append((scanned_host.address,serv.port))
-        return services
+        return services if services else None
