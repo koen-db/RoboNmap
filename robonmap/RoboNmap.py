@@ -8,7 +8,7 @@ from time import sleep
 import datetime
 
 class RoboNmap(object):
-    ROBOT_LIBRARY_SCOPE = 'GLOBAL'
+    ROBOT_LIBRARY_SCOPE = 'TEST'
 
     def __init__(self):
         '''
@@ -117,7 +117,7 @@ class RoboNmap(object):
 
 
     @keyword
-    def nmap_os_services_scan(self, target, portlist=None, version_intense = 7, file_export = None):
+    def nmap_os_services_scan(self, target, portlist=None, version_intense = 7, file_export = None, udp = None):
         '''
         Runs an nmap scan with OS detection and service detection. Options used are: -sV --version-intensity <default:7> -p <portlist>
         Arguments:
@@ -126,6 +126,7 @@ class RoboNmap(object):
             example: 121,161,240 or 1-100
             - ``version_intense``: Version intensity of OS detection, `nmap` default is 7
             - ``file_export``: is an optional param that exports the file to a txt file with the -oN flag
+            - ``udp``: optional param that also scans UDP. REQUIRES ROOT PRIVILEGES!
         Only stores the results, use `nmap print results` to print the results
         Examples:
         | nmap os services scan  | target | portlist | version_intense | file_export |
@@ -135,6 +136,8 @@ class RoboNmap(object):
             options += f' --version-intensity {version_intense}'
         if portlist:
             options += f' -p {portlist}'
+        if udp:
+            options += f' -sT -sU'
         self._call_nmap(target, options, file_export)
 
     @keyword
