@@ -51,8 +51,14 @@ Arguments:
 Examples:
 `| nmap script scan  | target | portlist | version_intense | script_name | file_export |`
 
-##### Print Nmap Scan Results
+##### Nmap Print Scan Results
 Retrieves the results of the current nmap scan results
 Examples:
 
 `| nmap print results |`
+
+
+#### Nmap Print Structured Results
+Retrieves the results of the current nmap scan results, as JSON
+Examples:
+`| nmap print structured results |`
