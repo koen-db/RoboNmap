@@ -14,9 +14,7 @@ Run Full TCP Scan
     Nmap All Tcp Scan  ${TARGET}
     nmap print results
 
-Run Specific UDP Scan on port 53
-    Nmap Specific Udp Scan  ${TARGET}  53
-    nmap print results
+
 
 Run Specific TCP Scan on port 80
     Nmap Specific Tcp Scan  ${TARGET}  80
@@ -25,9 +23,15 @@ Run Specific TCP Scan on port 80
 Run Service Discovery Scan
     Nmap Os Services Scan  ${TARGET}
     nmap print results
+    Nmap Print Structured Results
 
 Run SSH detection Scan
     Nmap Specific Tcp Scan  ${TARGET}  22
     Nmap Print Results
     ${SSH}=    Nmap Search For Service  SSH
     Log    ${SSH}
+
+# Only with root privileges
+# Run Specific UDP Scan on port 53
+#     Nmap Specific Udp Scan  ${TARGET}  53
+#     nmap print results

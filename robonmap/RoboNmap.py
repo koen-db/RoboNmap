@@ -196,6 +196,32 @@ class RoboNmap(object):
 
 
     @keyword
+    def nmap_print_structured_results(self):
+        '''
+        Retrieves the results of the most recent results and prints them to the log in a structured format
+        Examples:
+        | nmap print structured results |
+        '''
+        results = []
+        for scanned_hosts in self.results.hosts:
+            logger.info(scanned_hosts)
+            host_results = {"endtime": datetime.datetime.fromtimestamp(int(scanned_hosts.endtime)).isoformat(),
+                            "ipv4": scanned_hosts.ipv4, 
+                            "ipv6": scanned_hosts.ipv6, 
+                            "ports": scanned_hosts.extraports_reasons,
+                            "services": []}
+            for serv in scanned_hosts.services:
+                logger.info(serv)
+                host_results["services"].append({"port": serv.port, 
+                                            "protocol": serv.protocol, 
+                                            "state": serv.state, 
+                                            "service": serv.service, 
+                                            "banner": serv.banner, 
+                                            "scripts_results": serv.scripts_results})
+            results.append(host_results)
+        logger.info(results)
+
+    @keyword
     def nmap_search_for_service(self, service_name):
         '''
         Searches for a service in the results
@@ -215,3 +241,9 @@ class RoboNmap(object):
                     logger.info(f"Service {service_name} found on {scanned_host.address}, port {serv.port}")
                     services.append((scanned_host.address,serv.port))
         return services if services else None
+    
+if __name__ == '__main__':
+    nmap = RoboNmap()
+    nmap.nmap_os_services_scan("localhost", portlist="22-23", version_intense=7)
+    nmap.nmap_print_results()
+    nmap.nmap_print_structured_results()
