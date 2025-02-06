@@ -20,6 +20,7 @@ class RoboNmap(object):
     def _call_nmap(self, target, options='', file_export=None):
         '''
         Calls the nmap process with the given options
+        Returns the number of hosts that are up
         '''
         target = str(target)
         # IPv6 support
@@ -45,11 +46,11 @@ class RoboNmap(object):
         # Parse the results
         try:
             parsed = NmapParser.parse(nmproc.stdout)
-            print(parsed)
             self.results = parsed
+            return len([host for host in self.results.hosts if host.is_up()])
         except NmapParserException as ne:
             print('EXCEPTION: Exception in Parsing results: {0}'.format(ne.msg))
-
+            return -1
 
     @keyword
     def nmap_default_scan(self, target, file_export = None):
@@ -62,7 +63,21 @@ class RoboNmap(object):
         | nmap default scan  | target | file_export |
 
         '''
-        self._call_nmap(target, '', file_export)
+        return self._call_nmap(target, '', file_export)
+
+
+    @keyword
+    def nmap_custom_scan(self, target, options, file_export = None):
+        '''
+        Runs a custom nmap scan with the given options. Options are passed as a string.
+        Omit the `-6` flag, this is automatically added if the target is an IPv6 address.
+        - file_export is an optional param that exports the file to a txt file with the -oN flag
+        Only stores the results, use `nmap print results` to print the results
+
+        Examples:
+        | nmap custom scan  | target | options | file_export |
+        '''
+        return self._call_nmap(target, options, file_export)
 
 
     @keyword
@@ -79,7 +94,7 @@ class RoboNmap(object):
             options = f'-p {portlist}'
         else:
             options = '-p1-65535 '
-        self._call_nmap(target, options, file_export)
+        return self._call_nmap(target, options, file_export)
 
 
     @keyword
@@ -92,7 +107,7 @@ class RoboNmap(object):
         Examples:
         | nmap all tcp scan | target | [file_export] |
         '''
-        self._call_nmap(target, '-p1-65535', file_export)
+        return self._call_nmap(target, '-p1-65535', file_export)
 
 
     @keyword
@@ -113,7 +128,7 @@ class RoboNmap(object):
         options = f'-sU'
         if portlist:
             options += f' -p {portlist}'
-        self._call_nmap(target, options, file_export)
+        return self._call_nmap(target, options, file_export)
 
 
     @keyword
@@ -138,7 +153,7 @@ class RoboNmap(object):
             options += f' -p {portlist}'
         if udp:
             options += f' -sT -sU'
-        self._call_nmap(target, options, file_export)
+        return self._call_nmap(target, options, file_export)
 
     @keyword
     def nmap_script_scan(self, target, portlist=None, version_intense=7, script_name=None, file_export = None):
@@ -168,7 +183,7 @@ class RoboNmap(object):
             raise Exception('EXCEPTION: If you use specific script, you have to specify a port')
         else:
             options += f' -sC'
-        self._call_nmap(target, options, file_export)
+        return self._call_nmap(target, options, file_export)
 
 
     @keyword
