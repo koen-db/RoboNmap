@@ -214,8 +214,26 @@ class RoboNmap(object):
     def nmap_get_structured_results(self):
         '''
         Retrieves the results of the most recent results and prints them to the log in a structured format
+        Returns:
+        A dictionary containing the results of the scan
+            - endtime: The time when the scan ended
+            - hosts_up: The number of hosts that are up
+            - hosts: A list of dictionaries containing the results of each host
+                - address: The IP address of the host
+                - status: The status of the host (up or down)
+                - closed_ports: A list of ports that are closed
+                - [services]: An [optional] list of dictionaries containing the results of each service
+                    - port: The port number
+                    - protocol: The protocol used by the service
+                    - state: The state of the port (open or closed)
+                    - service: The name of the service
+                    - [banner]: The [optional] banner returned by the service
+                    - [scripts_results]: An [optional] list of dictionaries containing the results of each script
+                        - output: The output of the script
+                        - elements: The elements returned by the script
+                        - id: The ID of the script
         Examples:
-        | nmap print structured results |
+        | nmap get structured results |
         '''
         results = {"endtime": datetime.datetime.fromtimestamp(int(self.results.endtime)).isoformat() if self.results.endtime else None,
                    "hosts_up": self.results.hosts_up,
