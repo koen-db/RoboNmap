@@ -211,7 +211,7 @@ class RoboNmap(object):
 
 
     @keyword
-    def nmap_print_structured_results(self):
+    def nmap_get_structured_results(self):
         '''
         Retrieves the results of the most recent results and prints them to the log in a structured format
         Examples:
@@ -222,14 +222,14 @@ class RoboNmap(object):
                    "hosts": []
                    }
         for scanned_hosts in self.results.hosts:
-            logger.info(scanned_hosts)
+            logger.debug(scanned_hosts)
             host_result = { "address": scanned_hosts.address,
                             "status": scanned_hosts.status,
                             "closed_ports": scanned_hosts.extraports_reasons,
                             "services": [] if scanned_hosts.services else None
                             }
             for serv in scanned_hosts.services:
-                logger.info(serv)
+                logger.debug(serv)
                 service_result = {"port": serv.port,
                                   "protocol": serv.protocol,
                                   "state": serv.state,
@@ -243,7 +243,7 @@ class RoboNmap(object):
                 host_result["services"].append(service_result)
 
             results["hosts"].append(host_result)
-        logger.info(results)
+        logger.debug(results)
         return results
 
     @keyword
@@ -271,4 +271,4 @@ if __name__ == '__main__':
     nmap = RoboNmap()
     nmap.nmap_os_services_scan("localhost", portlist="22-23", version_intense=7)
     nmap.nmap_print_results()
-    nmap.nmap_print_structured_results()
+    nmap.nmap_get_structured_results()
