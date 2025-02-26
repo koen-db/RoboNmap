@@ -225,17 +225,23 @@ class RoboNmap(object):
             logger.info(scanned_hosts)
             host_result = { "address": scanned_hosts.address,
                             "status": scanned_hosts.status,
-                            "ports": scanned_hosts.extraports_reasons,
+                            "closed_ports": scanned_hosts.extraports_reasons,
                             "services": [] if scanned_hosts.services else None
                             }
             for serv in scanned_hosts.services:
                 logger.info(serv)
-                host_result["services"].append({"port": serv.port, 
-                                            "protocol": serv.protocol, 
-                                            "state": serv.state, 
-                                            "service": serv.service, 
-                                            "banner": serv.banner, 
-                                            "scripts_results": serv.scripts_results})
+                service_result = {"port": serv.port,
+                                  "protocol": serv.protocol,
+                                  "state": serv.state,
+                                  "service": serv.service
+                                  }
+                if serv.banner:
+                    service_result["banner"] = serv.banner
+                if serv.scripts_results:
+                    service_result["scripts_results"] = serv.scripts_results
+
+                host_result["services"].append(service_result)
+
             results["hosts"].append(host_result)
         logger.info(results)
 
