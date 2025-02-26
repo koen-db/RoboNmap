@@ -217,23 +217,26 @@ class RoboNmap(object):
         Examples:
         | nmap print structured results |
         '''
-        results = []
+        results = {"endtime": datetime.datetime.fromtimestamp(int(self.results.endtime)).isoformat() if self.results.endtime else None,
+                   "hosts_up": self.results.hosts_up,
+                   "hosts": []
+                   }
         for scanned_hosts in self.results.hosts:
             logger.info(scanned_hosts)
-            host_results = {"endtime": datetime.datetime.fromtimestamp(int(scanned_hosts.endtime)).isoformat(),
-                            "ipv4": scanned_hosts.ipv4, 
-                            "ipv6": scanned_hosts.ipv6, 
+            host_result = { "address": scanned_hosts.address,
+                            "status": scanned_hosts.status,
                             "ports": scanned_hosts.extraports_reasons,
-                            "services": []}
+                            "services": [] if scanned_hosts.services else None
+                            }
             for serv in scanned_hosts.services:
                 logger.info(serv)
-                host_results["services"].append({"port": serv.port, 
+                host_result["services"].append({"port": serv.port, 
                                             "protocol": serv.protocol, 
                                             "state": serv.state, 
                                             "service": serv.service, 
                                             "banner": serv.banner, 
                                             "scripts_results": serv.scripts_results})
-            results.append(host_results)
+            results["hosts"].append(host_result)
         logger.info(results)
 
     @keyword
