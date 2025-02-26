@@ -244,6 +244,7 @@ class RoboNmap(object):
 
             results["hosts"].append(host_result)
         logger.info(results)
+        return results
 
     @keyword
     def nmap_search_for_service(self, service_name):
