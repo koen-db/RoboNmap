@@ -134,7 +134,7 @@ class RoboNmap(object):
     @keyword
     def nmap_os_services_scan(self, target, portlist=None, version_intense = 7, file_export = None, udp = None):
         '''
-        Runs an nmap scan with OS detection and service detection. Options used are: -sV --version-intensity <default:7> -p <portlist>
+        Runs an nmap scan with OS detection and service detection. Options used are: -Pn -sV --version-intensity <default:7> -p <portlist>
         Arguments:
             - ``target``: IP or the range of IPs that need to be tested
             - ``portlist``: list of ports, range of ports that need to be tested. They can either be comma separated or separated by hyphen
@@ -146,7 +146,7 @@ class RoboNmap(object):
         Examples:
         | nmap os services scan  | target | portlist | version_intense | file_export |
         '''
-        options = f'-sV'
+        options = f'-Pn -sV'
         if version_intense:
             options += f' --version-intensity {version_intense}'
         if portlist:
